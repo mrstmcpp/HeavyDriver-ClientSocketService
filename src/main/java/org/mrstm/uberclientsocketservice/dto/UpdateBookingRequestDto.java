@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RideResponseDto {
-    public Boolean response;
-    public Long bookingId;
+public class UpdateBookingRequestDto {
+    private Long driverId;
+    private String bookingStatus;
 }
