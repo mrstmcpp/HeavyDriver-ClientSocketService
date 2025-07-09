@@ -13,7 +13,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.sql.Time;
+
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,16 +25,13 @@ import java.util.concurrent.TimeoutException;
 @CrossOrigin
 public class DriverRequestController {
     private final SimpMessagingTemplate template;
-    private final SimpMessagingTemplate simpMessagingTemplate;
     private final RestTemplate restTemplate;
     private final KafkaProducerService kafkaProducerService;
-
     private final Map<Long , CompletableFuture<Boolean>> bookingFutures = new ConcurrentHashMap<>();
 
 
-    public DriverRequestController(SimpMessagingTemplate template, SimpMessagingTemplate simpMessagingTemplate, RestTemplate restTemplate, KafkaProducerService kafkaProducerService) {
+    public DriverRequestController(SimpMessagingTemplate template,  RestTemplate restTemplate , KafkaProducerService kafkaProducerService) {
         this.template = template;
-        this.simpMessagingTemplate = simpMessagingTemplate;
         this.restTemplate = restTemplate;
         this.kafkaProducerService = kafkaProducerService;
     }
@@ -47,7 +44,7 @@ public class DriverRequestController {
         sendDriverNewRideRequest(rideRequestDto);
 
         try{
-            Boolean result = future.get(30 , TimeUnit.SECONDS);
+            Boolean result = future.get(30 , TimeUnit.SECONDS); //currently setting it to 30sec to test
             return new ResponseEntity<>(result , HttpStatus.OK);
         }catch (TimeoutException e){
             System.out.println("Timeout waiting for drivers.");
@@ -63,7 +60,6 @@ public class DriverRequestController {
         //TODO: currently sending to every driver , should go only to nearby drivers;
         System.out.println("Our booking id from sendDriverNewRideRequest : " + rideRequestDto.getBookingId());
         template.convertAndSend("/topic/rideRequest", rideRequestDto);
-
     }
 
     @MessageMapping("/rideResponse/{userId}")
@@ -96,8 +92,13 @@ public class DriverRequestController {
     }
 
 
-    @GetMapping("")
-    public void help(){
-        kafkaProducerService.publishMessage("test-topic" , "Hello kafka");
+    @MessageMapping("/driver-location")
+    public void driverNewLocation(DriverNewLocationDto driverNewLocationDto){
+        Long driverId = driverNewLocationDto.getDriverId();
+        Double lat = driverNewLocationDto.getLatitude();
+        Double lon = driverNewLocationDto.getLongitude();
+        String payload = String.format("{\"driverId\":\"%s\",\"lat\":%f,\"lon\":%f}", driverId, lat, lon);
+        kafkaProducerService.publishMessage("driver-location" , payload);
+//        System.out.println(driverNewLocationDto.getDriverId() + " " + driverNewLocationDto.getLatitude() + " " + driverNewLocationDto.getLongitude());
     }
 }

@@ -9,6 +9,7 @@ public class KafkaProducerService {
 
     public KafkaProducerService(KafkaTemplate<String, String> kafkaTemplate){
         this.kafkaTemplate = kafkaTemplate;
+
     }
 
     public void publishMessage(String topic , String message){
