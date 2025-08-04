@@ -14,9 +14,4 @@ public class KafkaConsumerService {
     public void listenBookings(String message){
         System.out.println("message " + message);
     }
-
-    @KafkaListener(topics = "driver-location" , groupId = "group-1")
-    public void listenDriverLocation(String message){
-        System.out.println("message " + message);
-    }
 }
