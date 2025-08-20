@@ -62,6 +62,12 @@ public class DriverRequestController {
         template.convertAndSend("/topic/rideRequest", rideRequestDto);
     }
 
+    @PostMapping("/notify")
+    public void sendConfirmedNotification(@RequestBody NotificationDTO requestDto) {
+        System.out.println("Confirmation Notification Sent");
+        template.convertAndSend("/topic/notify", requestDto);
+    }
+
     @MessageMapping("/rideResponse/{userId}")
     public synchronized void rideResponseHandler(@DestinationVariable Long userId , RideResponseDto responseDto) { //synchronized is added so that it could be accessible to one client at a moment
 //        System.out.println(rideResponseDto.getResponse() + " " + userId);
@@ -71,12 +77,14 @@ public class DriverRequestController {
                 .bookingStatus("SCHEDULED")
                 .build();
         try {
+
             ResponseEntity<DriverAcceptedResponseDto> res =
                     restTemplate.postForEntity(
                             "http://localhost:3002/api/v1/booking/" + responseDto.getBookingId(),
                             requestDto,
                             DriverAcceptedResponseDto.class
                     );
+//                sendConfirmedNotification(requestDto);
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             System.err.println("Status Code: " + e.getStatusCode());
             System.err.println("Headers: " + e.getResponseHeaders());
@@ -99,6 +107,7 @@ public class DriverRequestController {
         Double lon = driverNewLocationDto.getLongitude();
         String payload = String.format("{\"driverId\":\"%s\",\"lat\":%f,\"lon\":%f}", driverId, lat, lon);
         kafkaProducerService.publishMessage("driver-location" , payload);
+        //TODO : send new location also to the client
 //        System.out.println(driverNewLocationDto.getDriverId() + " " + driverNewLocationDto.getLatitude() + " " + driverNewLocationDto.getLongitude());
     }
 }
