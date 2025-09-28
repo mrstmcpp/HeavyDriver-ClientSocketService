@@ -24,9 +24,9 @@ public class KafkaController {
         return ResponseEntity.ok("Message published to test topic.");
     }
 
-//    @PostMapping("/update-driver-location")
-//    public ResponseEntity<String> updateDriverLocation(String message){
-//        kafkaProducerService.publishMessage("driver-location" , message);
-//        return ResponseEntity.ok("Updated");
-//    }
+    @PostMapping("/update-driver-location")
+    public ResponseEntity<String> updateDriverLocation(String message){
+        kafkaProducerService.publishMessage("driver-location" , message);
+        return ResponseEntity.ok("Updated");
+    }
 }

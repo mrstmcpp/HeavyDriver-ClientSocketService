@@ -68,7 +68,14 @@ public class DriverRequestController {
         template.convertAndSend("/topic/notify", requestDto);
     }
 
+    @PostMapping("/testNotification/{userId}")
+    public void sendTestSingleNotification(@PathVariable String userId, @RequestBody NotificationDTO requestDto) {
+        System.out.println("test one to one notification");
+        template.convertAndSend("/topic/user/" + userId, requestDto);
+    }
+
     @MessageMapping("/rideResponse/{userId}")
+
     public synchronized void rideResponseHandler(@DestinationVariable Long userId , RideResponseDto responseDto) { //synchronized is added so that it could be accessible to one client at a moment
 //        System.out.println(rideResponseDto.getResponse() + " " + userId);
         System.out.println("Driver accepted booking: " + responseDto.getBookingId() + " by driverId= " + userId);
