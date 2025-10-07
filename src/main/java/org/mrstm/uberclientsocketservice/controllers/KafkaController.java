@@ -1,9 +1,8 @@
 package org.mrstm.uberclientsocketservice.controllers;
 
 
-import org.mrstm.uberclientsocketservice.Consumers.KafkaConsumerService;
+import org.mrstm.uberclientsocketservice.Consumers.NearbyDriverConsumer;
 import org.mrstm.uberclientsocketservice.Producers.KafkaProducerService;
-import org.mrstm.uberclientsocketservice.dto.RideRequestDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,17 +10,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/kafka")
 public class KafkaController {
     private final KafkaProducerService kafkaProducerService;
-    private final KafkaConsumerService kafkaConsumerService;
+    private final NearbyDriverConsumer kafkaConsumerService;
 
-    public KafkaController(KafkaProducerService kafkaProducerService , KafkaConsumerService kafkaConsumerService){
+    public KafkaController(KafkaProducerService kafkaProducerService , NearbyDriverConsumer kafkaConsumerService){
         this.kafkaProducerService = kafkaProducerService;
         this.kafkaConsumerService = kafkaConsumerService;
-    }
-
-    @PostMapping("")
-    public ResponseEntity<String> publishMessage(@RequestParam("message") String message){
-        kafkaProducerService.publishMessage("test-topic" , message);
-        return ResponseEntity.ok("Message published to test topic.");
     }
 
     @PostMapping("/update-driver-location")
