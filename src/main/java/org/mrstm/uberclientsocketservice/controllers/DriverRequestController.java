@@ -2,6 +2,8 @@ package org.mrstm.uberclientsocketservice.controllers;
 
 import org.mrstm.uberclientsocketservice.Producers.KafkaProducerService;
 import org.mrstm.uberclientsocketservice.dto.*;
+import org.mrstm.uberclientsocketservice.services.KafkaService;
+import org.mrstm.uberentityservice.dto.booking.RideResponseByDriver;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -9,8 +11,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 
@@ -27,13 +27,15 @@ public class DriverRequestController {
     private final SimpMessagingTemplate template;
     private final RestTemplate restTemplate;
     private final KafkaProducerService kafkaProducerService;
+    private final KafkaService kafkaService;
     private final Map<Long , CompletableFuture<Boolean>> bookingFutures = new ConcurrentHashMap<>();
 
 
-    public DriverRequestController(SimpMessagingTemplate template,  RestTemplate restTemplate , KafkaProducerService kafkaProducerService) {
+    public DriverRequestController(SimpMessagingTemplate template, RestTemplate restTemplate , KafkaProducerService kafkaProducerService, KafkaService kafkaService) {
         this.template = template;
         this.restTemplate = restTemplate;
         this.kafkaProducerService = kafkaProducerService;
+        this.kafkaService = kafkaService;
     }
 
     @PostMapping("/newride")
@@ -80,34 +82,49 @@ public class DriverRequestController {
         template.convertAndSend("/topic/driver/" + driverId, requestDto);
     }
 
-    @MessageMapping("/rideResponse/{userId}")
-    public synchronized void rideResponseHandler(@DestinationVariable Long userId , RideResponseDto responseDto) { //synchronized is added so that it could be accessible to one client at a moment
-//        System.out.println(rideResponseDto.getResponse() + " " + userId);
-        System.out.println("Driver accepted booking: " + responseDto.getBookingId() + " by driverId= " + userId);
-        UpdateBookingRequestDto requestDto = UpdateBookingRequestDto.builder()
-                .driverId((userId))
-                .bookingStatus("SCHEDULED")
-                .build();
+//    @MessageMapping("/rideResponse/{driverId}")
+//    public synchronized void rideResponseHandler(@DestinationVariable Long driverId , RideResponseDto responseDto) { //synchronized is added so that it could be accessible to one client at a moment
+//        System.out.println("Driver accepted booking: " + responseDto.getBookingId() + " by driverId= " + driverId);
+//        UpdateBookingRequestDto requestDto = UpdateBookingRequestDto.builder()
+//                .driverId((driverId))
+//                .bookingStatus("SCHEDULED")
+//                .build();
+//        try {
+//
+//            ResponseEntity<DriverAcceptedResponseDto> res =
+//                    restTemplate.postForEntity(
+//                            "http://localhost:3002/api/v1/booking/" + responseDto.getBookingId(),
+//                            requestDto,
+//                            DriverAcceptedResponseDto.class
+//                    );
+////                sendConfirmedNotification(requestDto);
+//        } catch (HttpClientErrorException | HttpServerErrorException e) {
+//            System.err.println("Status Code: " + e.getStatusCode());
+//            System.err.println("Headers: " + e.getResponseHeaders());
+//            System.err.println("Raw response body: \n" + e.getResponseBodyAsString());
+//            throw e;
+//        }
+//
+//        CompletableFuture<Boolean> future = bookingFutures.get(responseDto.getBookingId());
+//        if(future != null){
+//            future.complete(true);
+//        }
+//
+//    }
+
+
+    @MessageMapping("/rideResponse/{driverId}")
+    public void rideResponseHandler(@DestinationVariable Long driverId , RideResponseByDriver rideResponseByDriver) {
+        System.out.println("Driver accepted booking: " + rideResponseByDriver.getBookingId() + " by driverId= " + driverId);
         try {
-
-            ResponseEntity<DriverAcceptedResponseDto> res =
-                    restTemplate.postForEntity(
-                            "http://localhost:3002/api/v1/booking/" + responseDto.getBookingId(),
-                            requestDto,
-                            DriverAcceptedResponseDto.class
-                    );
-//                sendConfirmedNotification(requestDto);
-        } catch (HttpClientErrorException | HttpServerErrorException e) {
-            System.err.println("Status Code: " + e.getStatusCode());
-            System.err.println("Headers: " + e.getResponseHeaders());
-            System.err.println("Raw response body: \n" + e.getResponseBodyAsString());
-            throw e;
+            if(!rideResponseByDriver.isResponse()){
+                return;
+            }
+            kafkaService.publishConfirmedBookingEvent(rideResponseByDriver);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
         }
 
-        CompletableFuture<Boolean> future = bookingFutures.get(responseDto.getBookingId());
-        if(future != null){
-            future.complete(true);
-        }
 
     }
 

@@ -9,11 +9,10 @@ public class KafkaProducerService {
 
     public KafkaProducerService(KafkaTemplate<String, Object> kafkaTemplate){
         this.kafkaTemplate = kafkaTemplate;
-
     }
 
-    public void publishMessage(String topic , String message){
-        kafkaTemplate.send(topic , message);
+    public void publishMessage(String topic , Object object){
+        kafkaTemplate.send(topic , object);
     }
 
 }
