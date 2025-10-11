@@ -17,6 +17,10 @@ public class DriverLocationConsumer {
     @KafkaListener(topics = KafkaTopics.DRIVER_LOCATION , groupId = "socket-group")
     public void consumerDriverLocation(DriverLocation location){ //this will send real-time location to passenger using socket
         System.out.println("Received at socket side: " + location.getDriverId() + " " + location.getLatitude() + " " + location.getLongitude());
-        socketService.broadcastOngoingRideLocation();
+        try {
+            socketService.broadcastOngoingRideLocation(location);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 }
