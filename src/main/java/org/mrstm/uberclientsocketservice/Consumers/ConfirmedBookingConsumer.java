@@ -23,5 +23,6 @@ public class ConfirmedBookingConsumer {
     public void sendConfirmedNotificationToPassenger(RideResponseByDriver rideResponseByDriver){
         System.out.println("ready to send notification received in socket");
         socketService.notifyConfirmedBookingToPassenger(rideResponseByDriver);
+
     };
 }

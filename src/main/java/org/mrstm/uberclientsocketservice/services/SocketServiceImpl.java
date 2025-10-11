@@ -52,4 +52,9 @@ public class SocketServiceImpl implements SocketService{
             throw new RuntimeException(e.getMessage());
         }
     }
+
+    @Override
+    public void broadcastOngoingRideLocation() {
+
+    }
 }
