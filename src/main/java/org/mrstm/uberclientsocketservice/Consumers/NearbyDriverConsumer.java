@@ -15,7 +15,7 @@ public class NearbyDriverConsumer {
         this.socketService = socketService;
     }
 
-    @KafkaListener(topics = KafkaTopics.NEARBY_DRIVERS , groupId = "location-group")
+    @KafkaListener(topics = KafkaTopics.NEARBY_DRIVERS , groupId = "socket-group")
     public void consumeNearbyDrivers(NearbyDriverEvent payload){
         //got list not forward it to socket service to send notifications;
         socketService.notifyNearbyDrivers(payload);

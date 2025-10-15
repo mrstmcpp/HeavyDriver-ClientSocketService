@@ -16,13 +16,9 @@ public class ConfirmedBookingConsumer {
         this.socketService = socketService;
     }
 
-    @KafkaListener(topicPartitions = @TopicPartition(
-            topic = KafkaTopics.BOOKING_CONFIRMED,
-            partitions = {"0"}   // <-- fixed partitions for this consumer
-    ), groupId = "${spring.kafka.consumer.group-id}" )
+    @KafkaListener(topics = KafkaTopics.BOOKING_CONFIRMED, groupId = "socket-group")
     public void sendConfirmedNotificationToPassenger(RideResponseByDriver rideResponseByDriver){
         System.out.println("ready to send notification received in socket");
         socketService.notifyConfirmedBookingToPassenger(rideResponseByDriver);
-
     };
 }

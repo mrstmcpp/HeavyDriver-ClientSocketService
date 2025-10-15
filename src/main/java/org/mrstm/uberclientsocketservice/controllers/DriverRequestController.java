@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @Controller
-@RequestMapping("/api/socket")
+@RequestMapping("/")
 @CrossOrigin
 public class DriverRequestController {
     private final SimpMessagingTemplate template;

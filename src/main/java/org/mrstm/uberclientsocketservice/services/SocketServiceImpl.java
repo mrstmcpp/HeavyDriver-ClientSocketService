@@ -5,7 +5,6 @@ import org.mrstm.uberentityservice.dto.booking.RideResponseByDriver;
 import org.mrstm.uberentityservice.dto.location.DriverLocation;
 import org.mrstm.uberentityservice.dto.notification.RideRequestNotification;
 import org.mrstm.uberentityservice.dto.notification.RideUpdateNotification;
-import org.mrstm.uberentityservice.dto.socket.DriverLocationForPassenger;
 import org.mrstm.uberentityservice.models.BookingStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,7 @@ public class SocketServiceImpl implements SocketService {
     }
 
     @Override
-    public void notifyNearbyDrivers(NearbyDriverEvent nearbyDriverEvent) {
+    public void notifyNearbyDrivers(NearbyDriverEvent nearbyDriverEvent) { //sedning notification to nearby drivers
         List<DriverLocation> driverLocations = nearbyDriverEvent.getDriverLocationList();
         String bookingId = nearbyDriverEvent.getBookingId();
 
@@ -43,7 +42,7 @@ public class SocketServiceImpl implements SocketService {
     }
 
     @Override
-    public void notifyConfirmedBookingToPassenger(RideResponseByDriver rideResponseByDriver) {
+    public void notifyConfirmedBookingToPassenger(RideResponseByDriver rideResponseByDriver) { //to inform passenger
         try {
             RideUpdateNotification notification = RideUpdateNotification.builder()
                     .bookingId(rideResponseByDriver.getBookingId())
