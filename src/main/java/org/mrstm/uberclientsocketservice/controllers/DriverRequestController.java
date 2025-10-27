@@ -115,11 +115,12 @@ public class DriverRequestController {
 
     @MessageMapping("/rideResponse/{driverId}")
     public void rideResponseHandler(@DestinationVariable Long driverId , RideResponseByDriver rideResponseByDriver) {
-        System.out.println("Driver accepted booking: " + rideResponseByDriver.getBookingId() + " by driverId= " + driverId);
         try {
             if(!rideResponseByDriver.isResponse()){
+                System.out.println("Driver declined booking: " + rideResponseByDriver.getBookingId() + " by driverId= " + driverId);
                 return;
             }
+            System.out.println("Driver accepted booking: " + rideResponseByDriver.getBookingId() + " by driverId= " + driverId);
             kafkaService.publishConfirmedBookingEvent(rideResponseByDriver);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
