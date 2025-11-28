@@ -82,37 +82,6 @@ public class DriverRequestController {
         template.convertAndSend("/topic/driver/" + driverId, requestDto);
     }
 
-//    @MessageMapping("/rideResponse/{driverId}")
-//    public synchronized void rideResponseHandler(@DestinationVariable Long driverId , RideResponseDto responseDto) { //synchronized is added so that it could be accessible to one client at a moment
-//        System.out.println("Driver accepted booking: " + responseDto.getBookingId() + " by driverId= " + driverId);
-//        UpdateBookingRequestDto requestDto = UpdateBookingRequestDto.builder()
-//                .driverId((driverId))
-//                .bookingStatus("SCHEDULED")
-//                .build();
-//        try {
-//
-//            ResponseEntity<DriverAcceptedResponseDto> res =
-//                    restTemplate.postForEntity(
-//                            "http://localhost:3002/api/v1/booking/" + responseDto.getBookingId(),
-//                            requestDto,
-//                            DriverAcceptedResponseDto.class
-//                    );
-////                sendConfirmedNotification(requestDto);
-//        } catch (HttpClientErrorException | HttpServerErrorException e) {
-//            System.err.println("Status Code: " + e.getStatusCode());
-//            System.err.println("Headers: " + e.getResponseHeaders());
-//            System.err.println("Raw response body: \n" + e.getResponseBodyAsString());
-//            throw e;
-//        }
-//
-//        CompletableFuture<Boolean> future = bookingFutures.get(responseDto.getBookingId());
-//        if(future != null){
-//            future.complete(true);
-//        }
-//
-//    }
-
-
     @MessageMapping("/rideResponse/{driverId}")
     public void rideResponseHandler(@DestinationVariable Long driverId , RideResponseByDriver rideResponseByDriver) {
         try {
@@ -125,10 +94,7 @@ public class DriverRequestController {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
-
-
     }
-
 
     @MessageMapping("/driver-location")
     public void driverNewLocation(DriverNewLocationDto driverNewLocationDto){

@@ -1,7 +1,6 @@
 package org.mrstm.uberclientsocketservice.Consumers;
 
 import org.mrstm.uberclientsocketservice.services.SocketService;
-import org.mrstm.uberentityservice.dto.booking.RideResponseByDriver;
 import org.mrstm.uberentityservice.dto.booking.UpdateBookingResponseDto;
 import org.mrstm.uberentityservice.kafkaTopics.KafkaTopics;
 import org.springframework.kafka.annotation.KafkaListener;

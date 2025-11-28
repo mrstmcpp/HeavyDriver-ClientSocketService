@@ -2,12 +2,9 @@ package org.mrstm.uberclientsocketservice.services;
 
 import org.mrstm.uberentityservice.dto.booking.ConfirmedNotificationToPassengerDto;
 import org.mrstm.uberentityservice.dto.booking.NearbyDriverEvent;
-import org.mrstm.uberentityservice.dto.booking.RideResponseByDriver;
 import org.mrstm.uberentityservice.dto.booking.UpdateBookingResponseDto;
 import org.mrstm.uberentityservice.dto.location.DriverLocation;
 import org.mrstm.uberentityservice.dto.notification.RideRequestNotification;
-import org.mrstm.uberentityservice.dto.notification.RideUpdateNotification;
-import org.mrstm.uberentityservice.models.BookingStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
